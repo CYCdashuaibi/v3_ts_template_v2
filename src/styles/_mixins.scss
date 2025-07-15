@@ -1,0 +1,121 @@
+// 单行文本省略
+@mixin ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+// 多行文本省略（需自定义行数）
+@mixin multiline-ellipsis($lines: 2) {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+// 清除浮动
+@mixin clearfix {
+    &::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+}
+
+// 响应式字体（基于 vw）
+@mixin vw-font($size) {
+    font-size: ($size / 375) * 100vw;
+}
+
+// 响应式宽度
+@mixin vw-width($width) {
+    width: ($width / 375) * 100vw;
+}
+
+// 响应式高度
+@mixin vw-height($height) {
+    height: ($height / 375) * 100vw;
+}
+
+// flex 水平垂直居中
+@mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+// 自定义滚动条
+@mixin custom-scrollbar($width: 6px, $track-color: #f0f0f0, $thumb-color: #c1c1c1) {
+    &::-webkit-scrollbar {
+        width: $width;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: $track-color;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: $thumb-color;
+        border-radius: 10px;
+    }
+}
+
+// 通用 hover 效果（支持自定义颜色）
+@mixin hover-style($color: lighten($primary-color, 10%)) {
+    transition: all 0.3s ease;
+
+    &:hover {
+        background-color: $color;
+        cursor: pointer;
+    }
+}
+
+// 按钮状态：hover + active + disabled
+@mixin button-status($bg: $primary-color,
+    $hover: lighten($primary-color, 5%),
+    $active: darken($primary-color, 5%),
+    $text-color: #fff) {
+    background-color: $bg;
+    color: $text-color;
+    border: none;
+    border-radius: $border-radius;
+    padding: 6px 16px;
+    font-size: $font-size-base;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+        background-color: $hover;
+    }
+
+    &:active {
+        background-color: $active;
+    }
+
+    &:disabled {
+        background-color: $gray;
+        color: #999;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+}
+
+// 链接状态
+@mixin link-status($normal: $primary-color,
+    $hover: darken($primary-color, 10%),
+    $active: darken($primary-color, 20%)) {
+    color: $normal;
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    &:hover {
+        color: $hover;
+    }
+
+    &:active {
+        color: $active;
+    }
+
+    &:visited {
+        color: $normal;
+    }
+}
