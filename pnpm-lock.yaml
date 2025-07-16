@@ -20,6 +20,9 @@ importers:
       element-plus:
         specifier: ^2.10.4
         version: 2.10.4(vue@3.5.17(typescript@5.8.3))
+      ludash:
+        specifier: 0.1.0-pre
+        version: 0.1.0-pre
       pinia:
         specifier: ^3.0.3
         version: 3.0.3(typescript@5.8.3)(vue@3.5.17(typescript@5.8.3))
@@ -1318,6 +1321,9 @@ packages:
 
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
+
+  ludash@0.1.0-pre:
+    resolution: {integrity: sha512-stjctlc6imrc5Cbqaz8amGJaoVcJhPkCZzIYCy7ZbjYwImaaHLJz1QNwMk53cRKbvZZyAWdkt0u8dWhe03q42Q==}
 
   magic-string@0.30.17:
     resolution: {integrity: sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA==}
@@ -3117,6 +3123,8 @@ snapshots:
   lru-cache@5.1.1:
     dependencies:
       yallist: 3.1.1
+
+  ludash@0.1.0-pre: {}
 
   magic-string@0.30.17:
     dependencies:
