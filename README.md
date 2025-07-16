@@ -49,6 +49,69 @@ src/
 ├── main.ts         # 入口文件
 ```
 
+## 通用组件使用说明
+
+### YzForm 表单组件
+
+`YzForm` 是基于 Element Plus 二次封装的动态表单组件，支持通过 schema 配置表单项，自动生成表单，支持校验、双向绑定、插槽自定义按钮等。
+
+#### Props 说明
+- `modelValue`：表单数据对象，支持 v-model 双向绑定
+- `schema`：表单项配置数组（每项包含 prop、label、type、span、required、rules、componentProps、formItemProps 等）
+- `rules`：全局校验规则（可选）
+- `submitText`：提交按钮文本（可选，默认“提交”）
+- `cancelText`：重置按钮文本（可选，默认“重置”）
+- `gutter`：表单项间隔（可选，默认 20）
+- 其余 Element Plus `el-form` 支持的属性可透传
+
+#### 事件
+- `update:modelValue`：表单数据变更时触发
+- `submit`：点击提交按钮且校验通过时触发，参数为当前表单数据
+
+#### 基础用法示例
+```vue
+<template>
+  <YzForm
+    v-model="formData"
+    :schema="formSchema"
+    @submit="handleSubmit"
+  />
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { YzForm } from '@/components';
+
+const formData = ref({
+  username: '',
+  password: ''
+});
+
+const formSchema = [
+  { prop: 'username', label: '用户名', required: true },
+  { prop: 'password', label: '密码', type: 'input', required: true, componentProps: { type: 'password' } }
+];
+
+function handleSubmit(data: any) {
+  console.log('提交数据', data);
+}
+</script>
+```
+
+#### Schema 字段说明
+| 字段            | 说明                 | 类型                | 是否必填 |
+|-----------------|----------------------|---------------------|---------|
+| prop            | 字段名（model key）  | string              | 是      |
+| label           | 表单项标签           | string              | 是      |
+| type            | 组件类型（input等）  | string              | 否      |
+| span            | 所占栅格（1-24）     | number              | 否      |
+| required        | 是否必填             | boolean             | 否      |
+| rules           | 校验规则             | FormRules[string]   | 否      |
+| componentProps  | 传递给组件的属性     | object              | 否      |
+| formItemProps   | 传递给el-form-item   | object              | 否      |
+
+更多用法可参考组件源码或实际业务扩展。
+
 ## 安装与启动
 1. 安装依赖（推荐使用 pnpm，也可用 npm/yarn）
    ```bash
