@@ -1,3 +1,6 @@
+@use 'sass:color';
+@use './_variables' as *;
+
 // 单行文本省略
 @mixin ellipsis {
     overflow: hidden;
@@ -72,8 +75,8 @@
 
 // 按钮状态：hover + active + disabled
 @mixin button-status($bg: $primary-color,
-    $hover: lighten($primary-color, 5%),
-    $active: darken($primary-color, 5%),
+    $hover: color.adjust($primary-color, $lightness: 5%),
+    $active: color.adjust($primary-color, $lightness: -5%),
     $text-color: #fff) {
     background-color: $bg;
     color: $text-color;
@@ -101,8 +104,8 @@
 
 // 链接状态
 @mixin link-status($normal: $primary-color,
-    $hover: darken($primary-color, 10%),
-    $active: darken($primary-color, 20%)) {
+    $hover: color.adjust($primary-color, $lightness: -10%),
+    $active: color.adjust($primary-color, $lightness: -20%)) {
     color: $normal;
     text-decoration: none;
     transition: color 0.3s ease;
