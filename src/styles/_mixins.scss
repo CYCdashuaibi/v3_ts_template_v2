@@ -41,8 +41,9 @@
 }
 
 // flex 水平垂直居中
-@mixin flex-center {
+@mixin flex-center($direction: row) {
     display: flex;
+    flex-direction: $direction;
     justify-content: center;
     align-items: center;
 }
