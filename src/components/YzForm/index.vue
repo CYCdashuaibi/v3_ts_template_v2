@@ -1,9 +1,11 @@
 <template>
 	<el-form
 		ref="formRef"
+		label-width="auto"
 		v-bind="formAttrs"
 		:model="innerModel"
 		:rules="computedRules"
+		:show-message="true"
 	>
 		<el-row :gutter="gutter">
 			<el-col
@@ -20,18 +22,27 @@
 						:is="resolveComponent(field.type)"
 						v-model="innerModel[field.prop]"
 						v-bind="field.componentProps"
-					/>
+					>
+						<template v-if="field.type === 'select'" v-slot:default>
+							<el-option
+								v-for="opt in getSelectOptions(field)"
+								:key="opt.value"
+								:label="opt.label"
+								:value="opt.value"
+							/>
+						</template>
+					</component>
 				</el-form-item>
 			</el-col>
 		</el-row>
 
-		<el-form-item>
+		<el-form-item v-if="!hiddenActions" class="yz-form_actions">
 			<slot name="actions">
-				<el-button type="primary" @click="submit">
-					{{ submitText }}
-				</el-button>
 				<el-button @click="reset">
 					{{ cancelText }}
+				</el-button>
+				<el-button type="primary" @click="submit">
+					{{ submitText }}
 				</el-button>
 			</slot>
 		</el-form-item>
@@ -47,56 +58,76 @@ import {
 	defineEmits,
 	useAttrs,
 	defineOptions,
+	provide,
 } from 'vue';
+import { ElInput, ElSelect, ElDatePicker, ElSwitch } from 'element-plus';
 import type { FormInstance, FormRules, FormProps } from 'element-plus';
+import { isEqual } from 'lodash';
 
-// 支持递归注册名称
-defineOptions({ name: 'BaseForm' });
+import type {
+	IOwnProps,
+	IFieldComponentType,
+	IFieldSchema,
+	ExtendedSelectProps,
+} from './types';
 
-interface FieldSchema {
-	prop: string;
-	label: string;
-	type?: string;
-	span?: number;
-	required?: boolean;
-	rules?: FormRules[string];
-	componentProps?: Record<string, any>;
-	formItemProps?: Record<string, any>;
-}
+defineOptions({ name: 'YzForm' });
+
+type FieldComponentMap = {
+	input: typeof ElInput;
+	textarea: typeof ElInput;
+	select: typeof ElSelect;
+	datepicker: typeof ElDatePicker;
+	switch: typeof ElSwitch;
+};
+
+const componentMap: FieldComponentMap = {
+	input: ElInput,
+	textarea: ElInput,
+	select: ElSelect,
+	datepicker: ElDatePicker,
+	switch: ElSwitch,
+};
+
+const resolveComponent = <T extends IFieldComponentType>(
+	type: T,
+): FieldComponentMap[T] => componentMap[type] || ElInput;
 
 const props = defineProps<
-	{
-		modelValue: Record<string, any>;
-		schema: FieldSchema[];
-		rules?: FormRules;
-		submitText?: string;
-		cancelText?: string;
-		gutter?: number;
-	} & Omit<FormProps, 'model' | 'rules'>
+	IOwnProps & Partial<Omit<FormProps, 'model' | 'rules'>>
 >();
 
-const emit = defineEmits<{
-	(e: 'update:modelValue', val: Record<string, any>): void;
-	(e: 'submit', val: Record<string, any>): void;
-}>();
+const attrs = useAttrs();
 
-// el-form 其余属性
-const formAttrs = useAttrs() as Omit<FormProps, 'model' | 'rules'>;
+const {
+	modelValue,
+	schema,
+	rules,
+	submitText = '提交',
+	cancelText = '取消',
+	gutter = 20,
+	hiddenActions,
+	...formProps
+} = props;
 
-const gutter = props.gutter ?? 20;
+const formAttrs = {
+	...formProps,
+	...attrs,
+} as Partial<Omit<FormProps, 'model' | 'rules'>>;
+
 const formRef = ref<FormInstance>();
 const innerModel = ref({ ...props.modelValue });
 
 // 初始化内部模型
-function initModel() {
+const initModel = () => {
 	innerModel.value = { ...props.modelValue };
-}
+};
 initModel();
 
-// 合并规则
+// 合并校验规则
 const computedRules = computed<FormRules>(() => {
 	const merged: FormRules = { ...(props.rules || {}) };
-	props.schema.forEach((field) => {
+	(props.schema || []).forEach((field) => {
 		if (field.rules) {
 			merged[field.prop] = field.rules;
 		} else if (field.required && !merged[field.prop]) {
@@ -104,51 +135,76 @@ const computedRules = computed<FormRules>(() => {
 				{
 					required: true,
 					message: `请输入${field.label}`,
-					trigger: 'blur',
+					trigger: 'change',
 				},
 			];
 		}
 	});
+	
 	return merged;
 });
 
-const submitText = props.submitText ?? '提交';
-const cancelText = props.cancelText ?? '重置';
 
-// 双向绑定
+
+const getSelectOptions = (field: IFieldSchema) => {
+	return (field.componentProps as ExtendedSelectProps)?.options || [];
+};
+
+const emit = defineEmits<{
+	(e: 'update:modelValue', val: Record<string, any>): void;
+	(e: 'submit', val: Record<string, any>): void;
+}>();
+
 watch(
 	() => props.modelValue,
-	() => initModel(),
+	(val) => {
+		if (!isEqual(val, innerModel.value)) {
+			initModel();
+		}
+	},
 	{ deep: true },
 );
-watch(innerModel, (v) => emit('update:modelValue', v), { deep: true });
+watch(
+	innerModel,
+	(val) => {
+		if (!isEqual(val, props.modelValue)) {
+			emit('update:modelValue', val);
+		}
+	},
+	{ deep: true },
+);
 
-function resolveComponent(type = 'input') {
-	const map: Record<string, string> = {
-		input: 'el-input',
-		select: 'el-select',
-		textarea: 'el-input',
-		datepicker: 'el-date-picker',
-		switch: 'el-switch',
-	};
-	return map[type] || type;
-}
-
-function submit() {
-	formRef.value?.validate((valid) => {
-		if (valid) emit('submit', innerModel.value);
+// 表单方法
+const submit = () =>
+	formRef.value?.validate((valid: boolean) => {
+		valid && emit('submit', innerModel.value);
 	});
-}
 
-function reset() {
+const reset = () => {
 	formRef.value?.resetFields();
 	initModel();
 	emit('update:modelValue', innerModel.value);
-}
+};
+const validate = () =>
+	new Promise((res, rej) =>
+		formRef.value?.validate((valid, fields) =>
+			valid ? res(innerModel.value) : rej(fields),
+		),
+	);
+
+provide('formMethods', {
+	submit,
+	reset,
+	validate,
+	formRef,
+	formModel: innerModel,
+});
 </script>
 
 <style scoped lang="scss">
-.el-form-item {
-	margin-bottom: 16px;
+.yz-form_actions {
+	:deep(.el-form-item__content) {
+		justify-content: flex-end;
+	}
 }
 </style>
