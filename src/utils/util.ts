@@ -61,3 +61,32 @@ export const formatDate = (
 			return d.format(format);
 	}
 };
+
+/**
+ * 判断输入值是否为有效数字或可完全转换为数字的字符串
+ * 
+ * 规则：
+ * 1. 数字类型：直接返回 true（排除 NaN 和 Infinity）
+ * 2. 字符串类型：必须能完全转换为数字（如 '42' 允许，但 '40px' 不允许）
+ * 3. 其他类型：一律返回 false
+ * 
+ * @param value - 需要检测的值
+ * @returns 如果值是可解析的数字或数字类型则返回 true，否则返回 false
+ */
+export const isNumeric = (value: any): boolean => {
+	if (typeof value === 'number') {
+		return !isNaN(value);
+	}
+
+	if (typeof value === 'string') {
+		const trimmed = value.trim();
+
+		if (!trimmed) return false;
+
+		const num = Number(trimmed);
+
+		return !isNaN(num) && num.toString() === trimmed;
+	}
+
+	return false;
+};
