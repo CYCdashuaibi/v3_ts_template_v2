@@ -12,6 +12,11 @@ $gray-dark: #999;
 $gray: #ccc;
 $text-color: #333;
 
+// 容器
+$container-bg: #ffffff;
+$body-bg: #e5e5e5;
+$body-padding: 10px;
+
 // 字体
 $font-size-base: 14px;
 $font-size-small: 12px;
@@ -20,8 +25,8 @@ $line-height-base: 1.5;
 $font-family: "Helvetica Neue", Arial, sans-serif;
 
 // 尺寸
-$padding-base: 12px;
-$margin-base: 12px;
+$padding-base: 10px;
+$margin-base: 10px;
 $border-radius: 4px;
 
 // Z-index

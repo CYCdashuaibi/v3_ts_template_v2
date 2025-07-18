@@ -1,15 +1,27 @@
 @use './_variables' as *;
+@use './mixins' as *;
+
 
 body {
     font-family: $font-family;
     font-size: $font-size-base;
     color: $text-color;
-    background-color: $white;
+    background-color: $body-bg;
     margin: 0;
-    padding: 0;
+    padding: $body-padding;
 }
 
-html, body, #app {
+html,
+body,
+#app {
     height: 100%;
     width: 100%;
+}
+
+.yz-page-container {
+    @include yz-page-container;
+}
+
+.yz-card {
+    @include yz-card;
 }
