@@ -4,7 +4,7 @@
 		:style="`height: ${isExpand ? 'auto' : formatHeigth(initHeight)}`"
 	>
 		<!-- 搜索表单区域 -->
-		<div class="yz-search_form">
+		<div class="yz-search_form" ref="formContainerRef">
 			<el-form
 				ref="formRef"
 				label-width="auto"
@@ -51,6 +51,7 @@
 				class="collapse-btn"
 				underline="never"
 				@click="changeExpand"
+				v-if="isShowExpandBtn"
 			>
 				<span>{{ isExpand ? '收起' : '展开' }}</span>
 				<el-icon :class="isExpand ? 'pack-up' : 'expand'"
@@ -71,10 +72,13 @@ import {
 	useAttrs,
 	defineOptions,
 	provide,
+	onMounted,
+	onUnmounted,
+	nextTick,
 } from 'vue';
 import { ElInput, ElSelect, ElDatePicker, ElSwitch } from 'element-plus';
 import type { FormInstance, FormRules, FormProps } from 'element-plus';
-import { isEqual } from 'lodash';
+import { isEqual, debounce } from 'lodash';
 
 import { isNumeric } from '@/utils';
 
@@ -121,6 +125,7 @@ const formAttrs = {
 } as Partial<Omit<FormProps, 'model' | 'rules'>>;
 
 const formRef = ref<FormInstance>();
+const formContainerRef = ref();
 const innerModel = ref({ ...props.modelValue });
 
 // 初始化内部模型
@@ -204,10 +209,32 @@ provide('formMethods', {
 });
 
 // 折叠状态
-const isExpand = ref(false);
+const isExpand = ref<boolean>(false);
 const changeExpand = () => {
 	isExpand.value = !isExpand.value;
 };
+const isShowExpandBtn = ref<boolean>(false);
+const showExpandBtnHandle = debounce(() => {
+	if (!formContainerRef.value) {
+		console.error('容器元素尚未渲染');
+		return;
+	}
+
+	const rect: DOMRect = formContainerRef.value.getBoundingClientRect();
+	isShowExpandBtn.value = rect.height > Number(String(initHeight).replace('px', '')) - 10;
+}, 300);
+
+onMounted(() => {
+	nextTick(() => {
+		showExpandBtnHandle();
+
+		window.addEventListener('resize', showExpandBtnHandle);
+	});
+});
+
+onUnmounted(() => {
+	window.removeEventListener('resize', showExpandBtnHandle);
+});
 </script>
 
 <style scoped lang="scss">
