@@ -83,7 +83,6 @@ import {
 import type {
 	TableProps as ElTableProps,
 	ElTable,
-	ElPagination,
 } from 'element-plus';
 import { debounce } from 'lodash';
 
