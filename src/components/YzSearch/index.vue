@@ -80,7 +80,7 @@ import { ElInput, ElSelect, ElDatePicker, ElSwitch } from 'element-plus';
 import type { FormInstance, FormRules, FormProps } from 'element-plus';
 import { isEqual, debounce } from 'lodash';
 
-import { isNumeric } from '@/utils';
+import { isNumeric, eventBus, SEARCH_EVENTS } from '@/utils';
 
 import type {
 	IOwnProps,
@@ -212,11 +212,11 @@ provide('formMethods', {
 const isExpand = ref<boolean>(false);
 const changeExpand = () => {
 	isExpand.value = !isExpand.value;
+	eventBus.emit(SEARCH_EVENTS.EXPAND_CHANGE);
 };
 const isShowExpandBtn = ref<boolean>(false);
 const showExpandBtnHandle = debounce(() => {
 	if (!formContainerRef.value) {
-		console.error('容器元素尚未渲染');
 		return;
 	}
 
