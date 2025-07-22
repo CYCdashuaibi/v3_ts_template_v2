@@ -14,15 +14,15 @@ const request = axios.create({
 	timeout: 10000,
 });
 
-// let loadingInstance: any = null
+// let loadingInstance: any = null;
 
 // 添加请求拦截器
 request.interceptors.request.use((config) => {
 	// loadingInstance = ElLoading.service({
-	//   lock: true,
-	//   text: 'Loading...',
-	//   background: 'rgba(0, 0, 0, 0.7)',
-	// })
+	// 	lock: true,
+	// 	text: 'Loading...',
+	// 	background: 'rgba(0, 0, 0, 0.7)',
+	// });
 
 	// const userStore = useUserStore()
 
@@ -38,15 +38,15 @@ request.interceptors.request.use((config) => {
 // 响应拦截器
 request.interceptors.response.use(
 	(response) => {
-		if (response.data.code !== CodeStatus.SUCCESS) {
+		if (response.data.status === CodeStatus.SUCCESS) {
 			ElMessage.error(response.data.data || response.data.message);
 		}
 
-		// if (loadingInstance) loadingInstance.close()
+		// if (loadingInstance) loadingInstance.close();
 		return response.data;
 	},
 	(error) => {
-		// if (loadingInstance) loadingInstance.close()
+		// if (loadingInstance) loadingInstance.close();
 
 		// 错误信息
 		let message = '';

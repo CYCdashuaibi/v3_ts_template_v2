@@ -1,5 +1,5 @@
 export const CodeStatus = {
-  SUCCESS: 200,
+  SUCCESS: 'OK',
   NO_LOGIN: 401,
 } as const;
 
