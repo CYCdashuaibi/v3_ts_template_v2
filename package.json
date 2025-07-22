@@ -9,6 +9,9 @@
 	"scripts": {
 		"dev": "vite --open",
 		"build": "vue-tsc -b && vite build",
+		"build:test": "vue-tsc -b && vite build --mode test",
+		"build:dev": "vue-tsc -b && vite build --mode dev",
+		"build:local": "vue-tsc -b && vite build --mode devlocal",
 		"preview": "vite preview"
 	},
 	"dependencies": {
